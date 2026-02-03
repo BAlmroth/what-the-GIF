@@ -2,17 +2,12 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
+import cloudinary from '../config/cloudinary.js';
 
 const execAsync = promisify(exec);
 
-const exportDirectory = path.resolve('./downloads/gifs');
-
-// Create directory if it doesn't exist
-if (!fs.existsSync(exportDirectory)) {
-    fs.mkdirSync(exportDirectory, { recursive: true });
-}
-
-export const convertVideoToGif = async (videoPath, outputPath, options = {}) => {
+export const convertVideoToGif = async (videoPath, _outputPath, options = {}) => {
 
     const {
         startTime = '00:00:00',
@@ -21,17 +16,27 @@ export const convertVideoToGif = async (videoPath, outputPath, options = {}) => 
         fps = 10
     } = options;
 
-    // ffmpeg command to convert video to GIF
-    const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${videoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${outputPath}"`;
+    const tempGifPath = path.join(os.tmpdir(), `gif-${Date.now()}.gif`);
+
+    const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${videoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${tempGifPath}"`;
 
     try {
         console.log('Starting GIF conversion...');
-        const { stdout, stderr } = await execAsync(command);
-        console.log('GIF created successfully!');
-        return outputPath;
+        await execAsync(command);
+
+        console.log('Uploading GIF to Cloudinary...');
+        const result = await cloudinary.uploader.upload(tempGifPath, {
+            resource_type: 'image',
+            folder: 'gifs'
+        });
+
+        fs.unlinkSync(tempGifPath);
+
+        console.log('GIF uploaded:', result.secure_url);
+        return result.secure_url;
     }
     catch (error) {
         console.error('Error converting video to GIF:', error);
         throw error;
     }
-}
+};
