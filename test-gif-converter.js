@@ -1,15 +1,15 @@
+import { downloadYouTubeVideo } from "./services/youtubeDownloader.js";
 import { convertVideoToGif } from "./services/gifConverter.js";
-import path from "path";
 
-const videoPath = path.resolve('./downloads/ytdl-downloads/video.mp4');
-const outputPath = path.resolve('./downloads/gifs/output.gif'); // ignored
+const videoUrl = 'https://youtu.be/FUKmyRLOlAA?si=M3qbnD0neAh6EweZ';
 
-convertVideoToGif(videoPath, outputPath, {
-    startTime: '00:00:05',
-    duration: '10',
-    scaleWidth: 480,
-}).then((gifUrl) => {
-    console.log('GIF uploaded to Cloudinary:', gifUrl);
-}).catch((error) => {
-    console.error('Failed to convert video to GIF:', error);
+const video = await downloadYouTubeVideo(videoUrl);
+console.log('video downloaded to:', video.filepath);
+
+const gifUrl = await convertVideoToGif(video.filepath, null, {
+        startTime: '00:00:00',
+        duration: '5',
+        scaleWidth: 480,
 });
+
+console.log('Gif uploaded to cloudinary!', gifUrl);
