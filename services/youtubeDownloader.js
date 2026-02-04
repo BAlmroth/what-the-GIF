@@ -39,7 +39,7 @@ export const downloadYouTubeVideo = async (videoUrl) => {
     }
 
     return {
-        filepatch: outputPath,
+        filepath: outputPath,
         filename: outputFileName
     };
 };
