@@ -17,8 +17,6 @@ if (!fs.existsSync(tempDirectory)) {
     fs.mkdirSync(tempDirectory, { recursive: true });
 }
 
-const videoUrl = 'https://youtu.be/FUKmyRLOlAA?si=M3qbnD0neAh6EweZ';
-
 export const downloadYouTubeVideo = async (videoUrl) => {
     const timestamp = Date.now();
     const outputFileName = `video-${timestamp}.mp4`;
@@ -43,15 +41,4 @@ export const downloadYouTubeVideo = async (videoUrl) => {
         filename: outputFileName
     };
 };
-
-
-downloadYouTubeVideo(videoUrl, tempDirectory)
-    .then(() => console.log('Download completed.'))
-    .catch(error => console.error('Download failed:', error));
-
-    // if (fs.existsSync('/temp-donwloads/video.mp4')) {
-    //     console.log(os.tmpdir('/temp-donwloads/video.mp4'))
-    // }
-
-
 

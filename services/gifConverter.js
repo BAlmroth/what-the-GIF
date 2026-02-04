@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import cloudinary from '../config/cloudinary.js';
+import { cleanupTempFiles } from '../utils/cleanup.js';
 
 const execAsync = promisify(exec);
 
@@ -31,6 +32,7 @@ export const convertVideoToGif = async (videoPath, _outputPath, options = {}) =>
 
     const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${videoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
 
+    // Convert video to GIF
     try {
         console.log('Starting GIF conversion...');
         await execAsync(command);
@@ -41,13 +43,16 @@ export const convertVideoToGif = async (videoPath, _outputPath, options = {}) =>
             folder: 'gifs'
         });
 
-        fs.unlinkSync(gifPath);
-
         console.log('GIF uploaded:', result.secure_url);
+
+        // Cleanup temporary files
+        cleanupTempFiles(videoPath, gifPath);
+
         return result.secure_url;
     }
     catch (error) {
         console.error('Error converting video to GIF:', error);
+        cleanupTempFiles(videoPath, gifPath);
         throw error;
     }
 };
