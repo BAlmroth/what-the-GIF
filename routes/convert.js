@@ -7,10 +7,10 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { 
+    const {
       videoUrl,
-      title, 
-      startTime = "00:00:00", 
+      title,
+      startTime = "00:00:00",
       duration = "5",
     } = req.body;
 
@@ -22,31 +22,27 @@ router.post("/", async (req, res) => {
     const video = await downloadYouTubeVideo(videoUrl);
 
     console.log("Converting video to GIF...");
-    const gifUrl = await convertVideoToGif(video.filepath, null, {
+    const gifResult = await convertVideoToGif(video.filepath, null, {
       startTime,
       duration,
       scaleWidth: 480,
     });
 
     // Save GIF info to database
-    console.log("Saving GIF info to database...");
     const newGif = new Gif({
-      title: title || 'Untitled GIF',
-      url: gifUrl,
+      title: title || gifResult.filename.replace(".gif", ""),
+      url: gifResult.url,
       youtubeUrl: videoUrl,
-      startTime, 
-      duration
+      startTime,
+      duration,
     });
 
     await newGif.save();
 
-    console.log("Done!");
     res.json({
-      gifUrl, 
-      gifId: newGif._id
+      gifUrl: gifResult.url,
+      gifId: newGif._id,
     });
-
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

@@ -28,7 +28,6 @@ export const convertVideoToGif = async (videoPath, _outputPath, options = {}) =>
     const gifFileName = `gif-${timestamp}.gif`;
     const gifPath = path.join(tempDirectory, gifFileName);
 
-    // const tempGifPath = path.join(os.tmpdir(), `gif-${Date.now()}.gif`);
 
     const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${videoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
 
@@ -48,7 +47,11 @@ export const convertVideoToGif = async (videoPath, _outputPath, options = {}) =>
         // Cleanup temporary files
         cleanupTempFiles(videoPath, gifPath);
 
-        return result.secure_url;
+        return { 
+            url: result.secure_url,
+            filename: gifFileName,
+
+};
     }
     catch (error) {
         console.error('Error converting video to GIF:', error);
