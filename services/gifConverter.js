@@ -1,10 +1,8 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { fileURLToPath } from 'url';
-import { downloadYouTubeVideo } from './youtubeDownloader.js';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
 import cloudinary from '../config/cloudinary.js';
 import { cleanupTempFiles } from '../utils/cleanup.js';
 import { applySubtitlesToVideo } from './subtitleApplier.js';
