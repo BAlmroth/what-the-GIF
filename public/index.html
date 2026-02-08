@@ -17,7 +17,6 @@
     <iframe id="player"></iframe>
 
     <div class="subtitle-options">
-
       <h3>Subtitle Options</h3>
 
       <label>
@@ -27,12 +26,12 @@
 
       <label>
         <input type="radio" name="subtitles" value="custom" onchange="updateSubtitleUI(this.value)">
-        Custom text
-      </label>
+        Custom Text
+      </label><br>
 
       <label>
         <input type="radio" name="subtitles" value="upload" onchange="updateSubtitleUI(this.value)">
-        Upload SRT file
+        Upload .srt File
       </label>
 
       <div id="customTextBox" style="display:none; margin-top:10px;">
@@ -42,7 +41,6 @@
       <div id="uploadBox" style="display:none; margin-top:10px;">
         <input type="file" id="subtitleFile" accept=".srt" />
       </div>
-
     </div>
 
     <button id="convertGif">Create GIF</button>
@@ -54,19 +52,16 @@
     function updateSubtitleUI(value) {
       document.getElementById('customTextBox').style.display = value === 'custom' ? 'block' : 'none';
       document.getElementById('uploadBox').style.display = value === 'upload' ? 'block' : 'none';
-      
-      // Store selected value for later
       document.getElementById('subtitleOption').value = value;
     }
-    
-    // Hidden input to store subtitle choice
+
     const hiddenInput = document.createElement('input');
     hiddenInput.type = 'hidden';
     hiddenInput.id = 'subtitleOption';
     hiddenInput.value = 'none';
     document.body.appendChild(hiddenInput);
   </script>
-  
+
   <script src="app.js"></script>
 </body>
 

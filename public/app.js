@@ -19,7 +19,7 @@ document.getElementById("convertGif").onclick = async () => {
   if (!videoUrl) return;
 
   const useSubtitles = document.getElementById("subtitleOption").value;
-  const customText = document.getElementById("customSubtitleText")?.value || "";
+  const customText = document.getElementById("customText")?.value || "";
 
   result.innerHTML = "Creating GIF...";
 
@@ -40,8 +40,7 @@ document.getElementById("convertGif").onclick = async () => {
 
   const res = await fetch("/convert", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ videoUrl }),
+    body: formData
   });
 
   const data = await res.json();

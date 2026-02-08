@@ -14,10 +14,10 @@ const tempDirectory = path.resolve(__dirname, '../temp');
 export const applySubtitlesToVideo = async (videoPath, subtitlePath, options= {}) => {
 
     const {
-        fontSize = 28,
-        fontColor = 'yellow',
+        fontSize = 30,
+        fontColor = 'white',
         outlineColor = 'black',
-        outlineWidth = 2,
+        outlineWidth = 3,
         position = 'bottom'
     } = options;
 
@@ -75,17 +75,17 @@ export const createCustomSubtitle = async (text, startTime = 0, duration = 5) =>
 // Convert color names to hex values for FFmpeg
 function colorToHex(color) {
     const colors = {
-        white: 'FFFFFF',
-        black: '000000',
-        red: 'FF0000',
-        green: '00FF00',
-        blue: '0000FF',
-        yellow: 'FFFF00',
-        cyan: '00FFFF',
-        magenta: 'FF00FF'
+        white: '00FFFFFF',
+        black: '00000000',
+        red: '00FF0000',
+        green: '0000FF00',
+        blue: '000000FF',
+        yellow: '00FFFF00',
+        cyan: '0000FFFF',
+        magenta: '00FF00FF'
     };
 
-    return colors[color.toLowerCase()] || 'FFFFFF';
+    return colors[color.toLowerCase()] || '00FFFFFF';
 }
 
 // Format time in SRT format (HH:MM:SS,mmm)

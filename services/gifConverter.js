@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 
 const tempDirectory = path.resolve(__dirname, '../temp');
 
-export const convertVideoToGif = async (videoPath, _outputPath, options = {}) => {
+export const convertVideoToGif = async (videoPath, options = {}) => {
 
     const {
         startTime = '00:00:00',
@@ -30,41 +30,40 @@ export const convertVideoToGif = async (videoPath, _outputPath, options = {}) =>
     let subtitledVideoPath = null;
 
     try {
-        // Step 1: If subtitles provided, burn them into video FIRST
+        // Apply subtitles if provided
         if (subtitlePath && fs.existsSync(subtitlePath)) {
             console.log('Burning subtitles into video...');
             const subtitledVideo = await applySubtitlesToVideo(videoPath, subtitlePath);
             subtitledVideoPath = subtitledVideo.filepath;
-            processedVideoPath = subtitledVideoPath;  // ← Use subtitled video for GIF
-            console.log('Subtitles applied to video');
+            processedVideoPath = subtitledVideoPath;
+            console.log('Subtitles burned successfully:', subtitledVideoPath);
         }
 
-        // Step 2: Convert (subtitled) video to GIF
+        // Convert to GIF
         const timestamp = Date.now();
         const gifFileName = `gif-${timestamp}.gif`;
         const gifPath = path.join(tempDirectory, gifFileName);
 
-        const videoFilter = `fps=${fps},scale=${scaleWidth}:-1:flags=lanczos`;
-        const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${processedVideoPath}" -vf "${videoFilter}" -loop 0 "${gifPath}"`;
-
         console.log('Converting to GIF...');
+        const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${processedVideoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
+        
         await execAsync(command);
-
+        
         if (!fs.existsSync(gifPath)) {
             throw new Error('GIF file was not created');
         }
-
+        
         const stats = fs.statSync(gifPath);
         console.log('GIF size:', (stats.size / 1024 / 1024).toFixed(2), 'MB');
 
-        // Step 3: Upload to Cloudinary
+        // Upload to Cloudinary
         console.log('Uploading to Cloudinary...');
         const result = await cloudinary.uploader.upload(gifPath, {
             resource_type: 'image',
             folder: 'gifs'
         });
 
-        // Step 4: Cleanup
+        // Cleanup
         const filesToClean = [videoPath, gifPath];
         if (subtitlePath) filesToClean.push(subtitlePath);
         if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);  // ← Clean subtitled video too

@@ -3,7 +3,6 @@ import multer from "multer";
 import Gif from "../schemas/Gifs.js";
 import { downloadYouTubeVideo } from "../services/youtubeDownloader.js";
 import { convertVideoToGif } from "../services/gifConverter.js";
-import { downloadSubtitles, extractVideoId } from "../services/subtitleDownloader.js";
 import { createCustomSubtitle } from "../services/subtitleApplier.js";
 
 const router = express.Router();
@@ -21,9 +20,8 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
       title,
       startTime = "00:00:00",
       duration = "5",
-      useSubtitles = "none", // "none", "youtube", "custom"
-      customSubtitleText = "",
-      subtitleLanguage = "en"
+      useSubtitles = "none",
+      customSubtitleText = ""
     } = req.body;
 
     if (!videoUrl) {
@@ -34,24 +32,14 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
     const video = await downloadYouTubeVideo(videoUrl);
     videoPath = video.filepath;
 
-    // Handle subtitles based on user selection
-    if (useSubtitles === "youtube") {
-      console.log("Downloading subtitles from YouTube...");
-      const videoId = extractVideoId(videoUrl);
-      const subtitles = await downloadSubtitles(videoId, subtitleLanguage);
-
-      if (subtitles) {
-        subtitlePath = subtitles.filepath;
-      }
-
-    } else if (useSubtitles === "custom" && customSubtitleText) {
+    // Handle custom subtitles
+    if (useSubtitles === "custom" && customSubtitleText) {
       console.log("Creating custom subtitle file...");
       subtitlePath = await createCustomSubtitle(
         customSubtitleText,
         parseTime(startTime),
         parseFloat(duration)
       );
-
     } else if (useSubtitles === "upload" && req.file) {
       console.log("Using uploaded subtitle file...");
       subtitlePath = req.file.path;
@@ -65,8 +53,7 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
       subtitlePath
     });
 
-    // Save GIF info to database
-    console.log('💾 Saving to database...');
+    console.log('Saving to database...');
     const newGif = new Gif({
       title: title || 'Untitled GIF',
       url: gifResult.url,
@@ -91,7 +78,7 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
 
 
   } catch (err) {
-    console.error(err);
+    console.error("Error in /convert route:", err);
     res.status(500).json({ error: err.message });
   }
 });
