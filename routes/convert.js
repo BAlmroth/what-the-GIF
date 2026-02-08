@@ -7,12 +7,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const {
-      videoUrl,
-      title,
-      startTime = "00:00:00",
-      duration = "5",
-    } = req.body;
+    const { videoUrl, title, startTime = "0", duration = "5" } = req.body;
 
     if (!videoUrl) {
       return res.status(400).json({ error: "videoUrl is required" });
@@ -36,7 +31,6 @@ router.post("/", async (req, res) => {
       startTime,
       duration,
     });
-
     await newGif.save();
 
     res.json({

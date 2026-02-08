@@ -1,16 +1,15 @@
 const input = document.getElementById("videoUrl");
 const iframe = document.getElementById("player");
 const result = document.getElementById("result");
+const startTimeInput = document.getElementById("startTime");
 
 document.getElementById("loadVideo").onclick = () => {
   const url = input.value.trim();
   const videoId = extractVideoId(url);
-
   if (!videoId) {
     alert("Invalid YouTube URL");
     return;
   }
-
   iframe.src = `https://www.youtube.com/embed/${videoId}`;
 };
 
@@ -18,12 +17,17 @@ document.getElementById("convertGif").onclick = async () => {
   const videoUrl = input.value.trim();
   if (!videoUrl) return;
 
+  const startTime = parseFloat(startTimeInput.value) || 0;
+  
   result.innerHTML = "Creating GIF...";
-
+  
   const res = await fetch("/convert", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ videoUrl }),
+    body: JSON.stringify({ 
+      videoUrl,
+      startTime: startTime.toString()
+    }),
   });
 
   const data = await res.json();
@@ -36,6 +40,7 @@ document.getElementById("convertGif").onclick = async () => {
   result.innerHTML = `
     <p>GIF created</p>
     <img src="${data.gifUrl}" />
+    <p>GIF URL: ${data.gifUrl}</p>
   `;
 };
 

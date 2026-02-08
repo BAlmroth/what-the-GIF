@@ -9,17 +9,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = 4000;
 
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use("/gifs", gifRoutes);
 app.use("/convert", gifConverterRoutes);
 
-app.use(express.json());
-
-app.use(express.static(path.join(__dirname, "public")));
-
 await connectDB();
-
-
-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
