@@ -10,6 +10,15 @@ const gifSchema = new Schema(
       type: String,
       required: true, // lägg till validering/säkerhet?
     },
+    hasSubtitles: {
+      type: Boolean,
+      default: false,
+    },
+    subtitleLanguage: String,
+    subtitleType: {
+      type: String,
+      enum: ['youtube', 'custom', 'upload', 'null'],
+    }
   },
   { timestamps: true }
 );

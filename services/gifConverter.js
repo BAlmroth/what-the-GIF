@@ -1,12 +1,11 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { fileURLToPath } from 'url';
-import { downloadYouTubeVideo } from './youtubeDownloader.js';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
 import cloudinary from '../config/cloudinary.js';
 import { cleanupTempFiles } from '../utils/cleanup.js';
+import { applySubtitlesToVideo } from './subtitleApplier.js';
 
 const execAsync = promisify(exec);
 
@@ -15,47 +14,79 @@ const __dirname = path.dirname(__filename);
 
 const tempDirectory = path.resolve(__dirname, '../temp');
 
-export const convertVideoToGif = async (videoPath, _outputPath, options = {}) => {
+export const convertVideoToGif = async (videoPath, options = {}) => {
 
     const {
         startTime = '00:00:00',
         duration = '5',
         scaleWidth = 480,
-        fps = 10
+        fps = 10,
+        subtitlePath = null
     } = options;
 
-    const timestamp = Date.now();
-    const gifFileName = `gif-${timestamp}.gif`;
-    const gifPath = path.join(tempDirectory, gifFileName);
+    let processedVideoPath = videoPath;
+    let subtitledVideoPath = null;
 
-
-    const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${videoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
-
-    // Convert video to GIF
     try {
-        console.log('Starting GIF conversion...');
-        await execAsync(command);
+        // Apply subtitles if provided
+        if (subtitlePath && fs.existsSync(subtitlePath)) {
+            console.log('Burning subtitles into video...');
+            const subtitledVideo = await applySubtitlesToVideo(videoPath, subtitlePath);
+            subtitledVideoPath = subtitledVideo.filepath;
+            processedVideoPath = subtitledVideoPath;
+            console.log('Subtitles burned successfully:', subtitledVideoPath);
+        }
 
-        console.log('Uploading GIF to Cloudinary...');
+        // Convert to GIF
+        const timestamp = Date.now();
+        const gifFileName = `gif-${timestamp}.gif`;
+        const gifPath = path.join(tempDirectory, gifFileName);
+
+        console.log('Converting to GIF...');
+        const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${processedVideoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
+        
+        await execAsync(command);
+        
+        if (!fs.existsSync(gifPath)) {
+            throw new Error('GIF file was not created');
+        }
+        
+        const stats = fs.statSync(gifPath);
+        console.log('GIF size:', (stats.size / 1024 / 1024).toFixed(2), 'MB');
+
+        // Upload to Cloudinary
+        console.log('Uploading to Cloudinary...');
         const result = await cloudinary.uploader.upload(gifPath, {
             resource_type: 'image',
             folder: 'gifs'
         });
 
-        console.log('GIF uploaded:', result.secure_url);
+        // Cleanup
+        const filesToClean = [videoPath, gifPath];
+        if (subtitlePath) filesToClean.push(subtitlePath);
+        if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);  // ← Clean subtitled video too
+        cleanupTempFiles(...filesToClean);
 
-        // Cleanup temporary files
-        cleanupTempFiles(videoPath, gifPath);
+        console.log('GIF created:', result.secure_url);
 
-        return { 
+        return {
             url: result.secure_url,
-            filename: gifFileName,
+            cloudinaryId: result.public_id,
+            width: result.width,
+            height: result.height,
+            fileSize: result.bytes,
+            filename: gifFileName
+        };
 
-};
-    }
-    catch (error) {
-        console.error('Error converting video to GIF:', error);
-        cleanupTempFiles(videoPath, gifPath);
+    } catch (error) {
+        console.error('Error converting to GIF:', error);
+
+        // Cleanup on error
+        const filesToClean = [videoPath];
+        if (subtitlePath) filesToClean.push(subtitlePath);
+        if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);
+        cleanupTempFiles(...filesToClean);
+
         throw error;
     }
 };
