@@ -17,10 +17,10 @@ app.use("/convert", gifConverterRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use("/gifs", gifRoutes);
+app.use("/convert", gifConverterRoutes);
+
 await connectDB();
-
-
-
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
