@@ -5,8 +5,9 @@ export const deleteFile = (filePath) => {
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
             console.log(`Deleted file: ${filePath}`);
+            return true;
         }
-        return true;
+        return false;
     }
     catch (error) {
         console.error(`Error deleting file ${filePath}:`, error);

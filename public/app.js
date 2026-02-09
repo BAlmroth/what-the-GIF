@@ -18,12 +18,29 @@ document.getElementById("convertGif").onclick = async () => {
   const videoUrl = input.value.trim();
   if (!videoUrl) return;
 
+  const useSubtitles = document.getElementById("subtitleOption").value;
+  const customText = document.getElementById("customText")?.value || "";
+
   result.innerHTML = "Creating GIF...";
+
+  const formData = new FormData();
+  formData.append("videoUrl", videoUrl);
+  formData.append("useSubtitles", useSubtitles);
+
+  if (useSubtitles === "custom") {
+    formData.append("customSubtitleText", customText);
+  }
+
+  if (useSubtitles === "upload") {
+    const fileInput = document.getElementById("subtitleFile");
+    if (fileInput.files[0]) {
+      formData.append("subtitleFile", fileInput.files[0]);
+    }
+  }
 
   const res = await fetch("/convert", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ videoUrl }),
+    body: formData
   });
 
   const data = await res.json();
@@ -34,8 +51,9 @@ document.getElementById("convertGif").onclick = async () => {
   }
 
   result.innerHTML = `
-    <p>GIF created</p>
-    <img src="${data.gifUrl}" />
+    <p>GIF created${data.hasSubtitles ? ' with subtitles' : ''}!</p>
+    <img src="${data.gifUrl}" style="max-width: 100%;" />
+    <p><a href="${data.gifUrl}" target="_blank">Open in new tab</a></p>
   `;
 };
 
