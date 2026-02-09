@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import fs from 'fs';
-import path, { format } from 'path';
+import path from 'path';
 import util from 'util';
 import { fileURLToPath } from 'url';
 
@@ -25,14 +25,11 @@ export const applySubtitlesToVideo = async (videoPath, subtitlePath, options= {}
     const outPath = path.join(tempDirectory, `video-subtitled-${timestamp}.mp4`);
 
 
-    // FFmpeg command to burn subtitles into video
-
-    // Escape paths for FFmpeg on Windows
     const escapedSubPath = subtitlePath.replace(/\\/g, '/').replace(/:/g, '\\:');
 
-    const subtitleFilter = `subtitles='${escapedSubPath}':force_style='FontSize=${fontSize},PrimaryColour=&H${colorToHex(fontColor)}&,OutlineColour=&H${colorToHex(outlineColor)}&,Outline=${outlineWidth},Alignment=${position === 'top' ? 6 : 2}'`;
+    const forceStyle = `FontSize=${fontSize},PrimaryColour=&H${colorToHex(fontColor)}&,OutlineColour=&H${colorToHex(outlineColor)}&,Outline=${outlineWidth},Alignment=${position === 'top' ? 6 : 2}`;
 
-    const command = `ffmpeg -i "${videoPath}" -vf "${subtitleFilter}" -c:a copy "${outPath}"`;
+    const command = `ffmpeg -i "${videoPath}" -vf "subtitles='${escapedSubPath}':force_style='${forceStyle}'" -c:a copy "${outPath}"`;
 
     try {
         console.log('Applying subtitles to video with command:', command);
