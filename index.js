@@ -7,9 +7,14 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const port = 4000;
 
 app.use(express.json());
+const PORT = process.env.PORT || 4000;
+
+app.use("/gifs", gifRoutes);
+app.use("/convert", gifConverterRoutes);
+
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/gifs", gifRoutes);
@@ -17,6 +22,6 @@ app.use("/convert", gifConverterRoutes);
 
 await connectDB();
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

@@ -21,8 +21,20 @@ export const downloadYouTubeVideo = async (videoUrl) => {
     const outputFileName = `video-${timestamp}.mp4`;
     const outputPath = path.join(tempDirectory, outputFileName);
     
-    // Use yt-dlp with lowest quality video and js runtime set to node
-    const command = `yt-dlp --js-runtimes node -f "worst[ext=mp4]/worst" -o "${outputPath}" "${videoUrl}"`;
+    // Build NordVPN SOCKS5 proxy URL
+    let proxyFlag = '';
+    if (process.env.NORDVPN_USERNAME && process.env.NORDVPN_PASSWORD) {
+        const server = process.env.NORDVPN_SERVER || 'se.socks.nordhold.net:1080';
+        const username = process.env.NORDVPN_USERNAME;
+        const password = process.env.NORDVPN_PASSWORD;
+        
+        proxyFlag = `--proxy "socks5://${username}:${password}@${server}"`;
+        console.log('🔒 Using NordVPN proxy:', server);
+    } else {
+        console.log('⚠️ No VPN configured, downloading directly');
+    }
+    
+    const command = `yt-dlp --js-runtimes node ${proxyFlag} -f "worst[ext=mp4]/worst" -o "${outputPath}" "${videoUrl}"`;
     
     try {
         console.log('Starting download from:', videoUrl);
