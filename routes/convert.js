@@ -69,14 +69,11 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
 
     await newGif.save();
 
-    console.log("Done!");
     res.json({
       gifUrl: gifResult.url,
       gifId: newGif._id,
       hasSubtitles: subtitlePath !== null
     });
-
-
   } catch (err) {
     console.error("Error in /convert route:", err);
     res.status(500).json({ error: err.message });
