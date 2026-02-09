@@ -1,16 +1,26 @@
 import express from "express";
-import dotenv from "dotenv";
+import connectDB from "./config/database.js";
+import gifRoutes from "./routes/gifs.js";
+import gifConverterRoutes from "./routes/convert.js";
+import path from 'path';
+import { fileURLToPath } from "url";
 
-dotenv.config();
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
+const port = 4000;
+
+app.use("/gifs", gifRoutes);
+app.use("/convert", gifConverterRoutes);
+
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("alles good!");
-});
+app.use(express.static(path.join(__dirname, "public")));
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+await connectDB();
+
+
+
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
