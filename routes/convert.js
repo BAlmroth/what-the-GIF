@@ -18,7 +18,7 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
     const {
       videoUrl,
       title,
-      startTime = "00:00:00",
+      startTime = "0",
       duration = "5",
       useSubtitles = "none",
       customSubtitleText = ""
@@ -66,7 +66,6 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
       height: gifResult.height,
       hasSubtitles: subtitlePath !== null
     });
-
     await newGif.save();
 
     res.json({
