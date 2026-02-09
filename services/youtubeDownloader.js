@@ -22,7 +22,7 @@ export const downloadYouTubeVideo = async (videoUrl) => {
     const outputPath = path.join(tempDirectory, outputFileName);
     
     // Use yt-dlp with lowest quality video and js runtime set to node
-    const command = `yt-dlp --extractor-args "youtube:player_client=android" --user-agent "com.google.android.youtube/19.09.37" -f "worst[ext=mp4]/worst" -o "${outputPath}" "${videoUrl}"`;
+    const command = `yt-dlp --extractor-args "youtube:player_client=web,ios" -f "worst[ext=mp4]/worst" -o "${outputPath}" "${videoUrl}"`; 
     
     try {
         console.log('Starting download from:', videoUrl);
