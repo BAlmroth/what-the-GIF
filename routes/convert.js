@@ -29,50 +29,71 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
     }
 
     console.log("Downloading video from YouTube...");
-    const video = await downloadYouTubeVideo(videoUrl);
-    videoPath = video.filepath;
+    try {
+      const video = await downloadYouTubeVideo(videoUrl);
+      videoPath = video.filepath;
+    } catch (err) {
+      console.error("YouTube download error:", err);
+      throw new Error(`Failed to download video: ${err.message}`);
+    }
 
     // Handle custom subtitles
     if (useSubtitles === "custom" && customSubtitleText) {
       console.log("Creating custom subtitle file...");
-      subtitlePath = await createCustomSubtitle(
-        customSubtitleText,
-        parseTime(startTime),
-        parseFloat(duration)
-      );
+      try {
+        subtitlePath = await createCustomSubtitle(
+          customSubtitleText,
+          parseTime(startTime),
+          parseFloat(duration)
+        );
+      } catch (err) {
+        console.error("Custom subtitle creation error:", err);
+        throw new Error(`Failed to create custom subtitle: ${err.message}`);
+      }
     } else if (useSubtitles === "upload" && req.file) {
       console.log("Using uploaded subtitle file...");
       subtitlePath = req.file.path;
     }
 
     console.log("Converting video to GIF...");
-    const gifResult = await convertVideoToGif(videoPath, {
-      startTime,
-      duration,
-      scaleWidth: 480,
-      subtitlePath
-    });
+    let gifResult;
+    try {
+      gifResult = await convertVideoToGif(videoPath, {
+        startTime,
+        duration,
+        scaleWidth: 480,
+        subtitlePath
+      });
+    } catch (err) {
+      console.error("GIF conversion error:", err);
+      throw new Error(`Failed to convert video to GIF: ${err.message}`);
+    }
 
     console.log('Saving to database...');
-    const newGif = new Gif({
-      title: title || 'Untitled GIF',
-      url: gifResult.url,
-      cloudinaryId: gifResult.cloudinaryId,
-      youtubeUrl: videoUrl,
-      startTime,
-      duration,
-      fileSize: gifResult.fileSize,
-      width: gifResult.width,
-      height: gifResult.height,
-      hasSubtitles: subtitlePath !== null
-    });
-    await newGif.save();
+    try {
+      const newGif = new Gif({
+        title: title || 'Untitled GIF',
+        url: gifResult.url,
+        cloudinaryId: gifResult.cloudinaryId,
+        youtubeUrl: videoUrl,
+        startTime,
+        duration,
+        fileSize: gifResult.fileSize,
+        width: gifResult.width,
+        height: gifResult.height,
+        hasSubtitles: subtitlePath !== null
+      });
+      await newGif.save();
 
-    res.json({
-      gifUrl: gifResult.url,
-      gifId: newGif._id,
-      hasSubtitles: subtitlePath !== null
-    });
+      res.json({
+        gifUrl: gifResult.url,
+        gifId: newGif._id,
+        hasSubtitles: subtitlePath !== null
+      });
+    } catch (err) {
+      console.error("Database save error:", err);
+      throw new Error(`Failed to save GIF to database: ${err.message}`);
+    }
   } catch (err) {
     console.error("Error in /convert route:", err);
     res.status(500).json({ error: err.message });
