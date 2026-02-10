@@ -52,13 +52,13 @@ export const applySubtitlesToVideo = async (videoPath, subtitlePath, options= {}
 };
 
 // Create custom subtitles
-export const createCustomSubtitle = async (text, duration = 5) => {
+export const createCustomSubtitle = async (text, startTime = 0, duration = 5) => {
     const timestamp = Date.now();
     const filename = `custom-subtitle-${timestamp}.srt`;
     const filepath = path.join(tempDirectory, filename);
 
-    const start = formatSRTTime(0);
-    const end = formatSRTTime(duration);
+    const start = formatSRTTime(startTime);
+    const end = formatSRTTime(startTime + duration);
 
     const srtContent = `1\n${start} --> ${end}\n${text}\n\n`;
 
