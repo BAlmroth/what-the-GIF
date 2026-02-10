@@ -1,4 +1,5 @@
 import express from "express";
+import { convertLimiter } from "../middleware/rateLimiter.js";
 import multer from "multer";
 import Gif from "../schemas/Gifs.js";
 import { downloadYouTubeVideo } from "../services/youtubeDownloader.js";
@@ -10,7 +11,7 @@ const router = express.Router();
 // Configure multer for parsing subtitle file uploads
 const upload = multer({ dest: 'temp/' });
 
-router.post("/", upload.single('subtitleFile'), async (req, res) => {
+router.post("/", convertLimiter, upload.single('subtitleFile'), async (req, res) => {
   let subtitlePath = null;
   let videoPath = null;
 
@@ -41,10 +42,13 @@ router.post("/", upload.single('subtitleFile'), async (req, res) => {
     if (useSubtitles === "custom" && customSubtitleText) {
       console.log("Creating custom subtitle file...");
       try {
+        const startTimeSeconds = parseFloat(startTime);
+        const durationSeconds = parseFloat(duration);
+
         subtitlePath = await createCustomSubtitle(
           customSubtitleText,
-          parseTime(startTime),
-          parseFloat(duration)
+          startTimeSeconds,
+          durationSeconds
         );
       } catch (err) {
         console.error("Custom subtitle creation error:", err);
