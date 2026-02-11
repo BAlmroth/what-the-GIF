@@ -1,0 +1,135 @@
+:root {
+  /* Colors */
+  --primary-color: #37237b;
+  --primary-hover: #4c3f79;
+  --background: #191823;
+  --secoundaryBackground: #342b61;
+  --text-primary: #efecec;
+  --text-secondary: #c3b9b9;
+  --border-color: #231236;
+  --light: #a292b2;
+
+  /* Spacing */
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --radius: 8px;
+
+  /* Fonts */
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+background: var(--background);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+h1 {
+  color: var(--text-primary);
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+h3 {
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+}
+
+a {
+  color: var(--light);
+  text-decoration: none;
+}
+
+/* forms */
+input,
+textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  background: var(--light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--border-color);
+  font-size: 1rem;
+  font-family: var(--font-main);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--border-color);
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+button {
+  width: 100%;
+  padding: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+  background: var(--primary-color);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .selector {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+
+  .url-section {
+    flex-direction: column;
+  }
+
+  .url-section button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg);
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .headerContent {
+    flex-direction: column;
+  }
+}
