@@ -5,6 +5,7 @@ import Gif from "../schemas/Gifs.js";
 import { downloadYouTubeVideo } from "../services/youtubeDownloader.js";
 import { convertVideoToGif } from "../services/gifConverter.js";
 import { createCustomSubtitle } from "../services/subtitleApplier.js";
+import { generateUniqueSlug } from "../utils/slugify.js";
 
 const router = express.Router();
 
@@ -74,9 +75,23 @@ router.post("/", convertLimiter, upload.single('subtitleFile'), async (req, res)
     }
 
     console.log('Saving to database...');
+
+    // Generate better default title if not provided
+    let gifTitle = title?.trim();
+    if (!gifTitle || gifTitle === "") {
+      const date = new Date().toISOString().split('T')[0];
+      const time = Date.now().toString().slice(-4);
+      gifTitle = `GIF-${date}-${time}`;
+    }
+
+    // Generate unique slug
+    const slug = await generateUniqueSlug(gifTitle, Gif);
+    console.log(`Generated slug: "${slug}" for title: "${gifTitle}"`);
+
     try {
       const newGif = new Gif({
-        title: title || 'Untitled GIF',
+        title: gifTitle,
+        slug: slug,
         url: gifResult.url,
         cloudinaryId: gifResult.cloudinaryId,
         youtubeUrl: videoUrl,
@@ -92,6 +107,8 @@ router.post("/", convertLimiter, upload.single('subtitleFile'), async (req, res)
       res.json({
         gifUrl: gifResult.url,
         gifId: newGif._id,
+        slug: newGif.slug,
+        shareUrl: `${req.protocol}://${req.get('host')}/${slug}`,
         hasSubtitles: subtitlePath !== null
       });
     } catch (err) {
