@@ -21,6 +21,7 @@ document.getElementById("convertGif").onclick = async () => {
       return;
     }
 
+    const gifTitle = document.getElementById("gifTitle").value.trim();
     const startTime = parseFloat(startTimeInput.value) || 0;
     const useSubtitles = document.getElementById("subtitleOption")?.value || "none";
     const customText = document.getElementById("customText")?.value || "";
@@ -29,6 +30,7 @@ document.getElementById("convertGif").onclick = async () => {
 
     const formData = new FormData();
     formData.append("videoUrl", videoUrl);
+    formData.append("title", gifTitle);
     formData.append("startTime", startTime.toString());
     formData.append("useSubtitles", useSubtitles);
 
