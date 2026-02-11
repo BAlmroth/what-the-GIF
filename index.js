@@ -3,6 +3,7 @@ import { apiLimiter, convertLimiter } from "./middleware/rateLimiter.js";
 import connectDB from "./config/database.js";
 import gifRoutes from "./routes/gifs.js";
 import gifConverterRoutes from "./routes/convert.js";
+import gifViewRoutes from "./routes/gif-view.js";
 import path from 'path';
 import { fileURLToPath } from "url";
 
@@ -24,10 +25,20 @@ await connectDB();
 // API routes with rate limiting
 app.use("/gifs", apiLimiter, gifRoutes);
 app.use("/convert", convertLimiter, gifConverterRoutes);
+app.use("/api", gifViewRoutes);
 
 // Root route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/gallery", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "gallery.html"));
+});
+
+// GIF by slug route
+app.get("/:slug", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "view-gif.html"));
 });
 
 // Start the server

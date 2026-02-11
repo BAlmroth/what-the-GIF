@@ -20,8 +20,10 @@ async function loadGifs() {
       .map(
         (gif) => `
       <div class="gif-card">
-        <img src="${gif.url}" alt="${gif.title}" loading="lazy" />
-        <p>${gif.title}</p>
+        <a href="/${gif.slug}" target="_blank">
+          <img src="${gif.url}" alt="${gif.title}" loading="lazy" />
+          <p>${gif.title}</p>
+        </a>
       </div>
     `,
       )

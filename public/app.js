@@ -103,7 +103,7 @@ document.getElementById("convertGif").onclick = async () => {
     result.innerHTML = `
       <p>GIF created${data.hasSubtitles ? " with subtitles" : ""}!</p>
       <img src="${data.gifUrl}" style="max-width: 100%;" />
-      <p><a href="${data.gifUrl}" target="_blank">Open in new tab</a></p>`;
+      <p><a href="${data.shareUrl}" target="_blank">Open GIF in new tab</a></p>`;
   } catch (error) {
     console.error("Error creating GIF:", error);
     result.innerHTML = `<p>Failed to create GIF: ${error.message}</p>`;
