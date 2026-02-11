@@ -1,80 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GIF Converter</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>GIF Converter</title>
-</head>
-
-<body>
-  <div class="container">
-    <h1>WHAT THE GIF?</h1>
-    <a href="/gallery.html">View GIF Gallery</a>
-    <input id="videoUrl" placeholder="Paste YouTube URL" />
-    <button id="loadVideo">Load video</button>
-    <iframe id="player"></iframe>
-
-    <div class="gif-controls">
-      <label for="startTime">Start Time (seconds):</label>
-      <input id="startTime" type="number" min="0" step="1" value="0" placeholder="0" />
-      <small>GIF duration: 5 sec</small>
-    </div>
-
-    <div class="subtitle-options">
-      <h3>Subtitle Options</h3>
-
-      <label>
-        <input type="radio" name="subtitles" value="none" checked onchange="updateSubtitleUI(this.value)" />
-        No Subtitles
-      </label><br>
-
-      <label>
-        <input type="radio" name="subtitles" value="custom" onchange="updateSubtitleUI(this.value)">
-        Custom Text
-      </label><br>
-
-      <label>
-        <input type="radio" name="subtitles" value="upload" onchange="updateSubtitleUI(this.value)">
-        Upload .srt File
-      </label>
-
-      <div id="customTextBox" style="display:none; margin-top:10px;">
-        <textarea id="customText" rows="3" placeholder="Enter subtitle text..."></textarea>
+  <body>
+    <section class="container">
+      <div class="header-section">
+        <h1>Create your own gif!</h1>
+        <p>Insert your youtube URL, select start time, subtitles, and go!</p>
       </div>
 
-      <div id="uploadBox" style="display:none; margin-top:10px;">
-        <input type="file" id="subtitleFile" accept=".srt" />
+      <div class="selector">
+        <div class="video-column">
+          <div class="url-section">
+            <input id="videoUrl" placeholder="Paste YouTube URL" />
+            <button id="loadVideo">Load video</button>
+          </div>
+          <iframe id="player"></iframe>
+          <button id="convertGif">Create GIF</button>
+        </div>
+
+        <div class="controls-column">
+          <div class="gif-controls">
+            <label for="startTime">Start Time (seconds):</label>
+            <input
+              id="startTime"
+              type="number"
+              min="0"
+              step="1"
+              value="0"
+              placeholder="0"
+            />
+            <small>GIF duration: 5 sec</small>
+          </div>
+
+          <div class="subtitle-options">
+            <h3>Subtitle Options</h3>
+
+            <label>
+              <input
+                type="radio"
+                name="subtitles"
+                value="none"
+                checked
+                onchange="updateSubtitleUI(this.value)"
+              />
+              No Subtitles
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="subtitles"
+                value="custom"
+                onchange="updateSubtitleUI(this.value)"
+              />
+              Custom Text
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="subtitles"
+                value="upload"
+                onchange="updateSubtitleUI(this.value)"
+              />
+              Upload .srt File
+            </label>
+
+            <div id="customTextBox" style="display: none; margin-top: 10px">
+              <textarea
+                id="customText"
+                rows="3"
+                placeholder="Enter subtitle text..."
+              ></textarea>
+            </div>
+
+            <div id="uploadBox" style="display: none; margin-top: 10px">
+              <input type="file" id="subtitleFile" accept=".srt" />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <button id="convertGif">Create GIF</button>
-    <div id="result"></div>
-  </div>
+      <div id="result"></div>
+    </section>
 
-  <div>
-    <p>This tool is for educational purposes only.
-      Users must have permission from copyright holders.
-      We do not condone copyright infringement.</p>
+    <script>
+      function updateSubtitleUI(value) {
+        document.getElementById("customTextBox").style.display =
+          value === "custom" ? "block" : "none";
+        document.getElementById("uploadBox").style.display =
+          value === "upload" ? "block" : "none";
+        document.getElementById("subtitleOption").value = value;
+      }
 
-      <h4>Contact</h4>
-      <p>johnahlenhed@gmail.com</p>
-  </div>
+      const hiddenInput = document.createElement("input");
+      hiddenInput.type = "hidden";
+      hiddenInput.id = "subtitleOption";
+      hiddenInput.value = "none";
+      document.body.appendChild(hiddenInput);
+    </script>
 
-  <script>
-    function updateSubtitleUI(value) {
-      document.getElementById('customTextBox').style.display = value === 'custom' ? 'block' : 'none';
-      document.getElementById('uploadBox').style.display = value === 'upload' ? 'block' : 'none';
-      document.getElementById('subtitleOption').value = value;
-    }
-
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.id = 'subtitleOption';
-    hiddenInput.value = 'none';
-    document.body.appendChild(hiddenInput);
-  </script>
-
-  <script src="app.js"></script>
-</body>
-
+    <script src="app.js"></script>
+    <script src="components.js"></script>
+  </body>
 </html>
