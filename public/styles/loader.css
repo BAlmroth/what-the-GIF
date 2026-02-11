@@ -1,0 +1,36 @@
+    .loader {
+        width: 85px;
+        height: 35px;
+        --g1:conic-gradient(from  90deg at 3px  3px ,#0000 90deg,#c10000 0);
+        --g2:conic-gradient(from -90deg at 22px 22px,#0000 90deg,#d86500 0);
+        --g3:conic-gradient(from  90deg at 3px  3px ,#0000 90deg,#e3d400 0);
+        --g4:conic-gradient(from -90deg at 22px 22px,#0000 90deg,#21c300 0);
+        --g5:conic-gradient(from  90deg at 3px  3px ,#0000 90deg,#0007ce 0);
+        --g6:conic-gradient(from -90deg at 22px 22px,#0000 90deg,#6600b5 0);
+        background:var(--g1),var(--g3),var(--g5), var(--g2),var(--g4),var(--g6);
+        background-size: 25px 25px;
+        background-repeat: no-repeat;
+        animation: l6 1s infinite alternate;
+      }
+      @keyframes l6 {
+        0%   {background-position:0 50% ,50% 50% ,100% 50% }
+        20%  {background-position:0 0   ,50% 50% ,100% 50% }
+        40%  {background-position:0 100%,50%  0  ,100% 50% }
+        60%  {background-position:0 50% ,50% 100%,100% 0   }
+        80%  {background-position:0 50% ,50% 50% ,100% 100%}
+        100% {background-position:0 50% ,50% 50% ,100% 50% }
+      }
+
+      .loader-with-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-xl);
+      }
+
+      .loader-text {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        font-weight: 500;
+      }

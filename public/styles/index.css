@@ -131,6 +131,10 @@ input[type="file"] {
 }
 
 /* results */
+.hidden {
+  display: none;
+}
+
 #result {
   max-width: 800px;
   margin: var(--spacing-2xl) auto 0;

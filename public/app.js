@@ -14,6 +14,8 @@ document.getElementById("loadVideo").onclick = () => {
 };
 
 document.getElementById("convertGif").onclick = async () => {
+  const result = document.getElementById("result");
+  result.classList.remove("hidden");
   try {
     const videoUrl = input.value.trim();
     if (!videoUrl) {
@@ -27,7 +29,12 @@ document.getElementById("convertGif").onclick = async () => {
       document.getElementById("subtitleOption")?.value || "none";
     const customText = document.getElementById("customText")?.value || "";
 
-    result.innerHTML = "Creating GIF...";
+    result.innerHTML = `
+      <div class="loader-with-text">
+        <div class="loader"></div>
+        <div class="loader-text">Creating your GIF...</div>
+      </div>
+    `;
 
     const formData = new FormData();
     formData.append("videoUrl", videoUrl);
