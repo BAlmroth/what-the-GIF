@@ -28,7 +28,7 @@ async function loadGifs() {
       .join("");
   } catch (err) {
     console.error("Error loading GIFs:", err);
-    grid.innerHTML = `<p class='error'>Failed to load GIFs: ${err.message}</p>`;
+    grid.innerHTML = `<p>Failed to load GIFs: ${err.message}</p>`;
   }
 }
 

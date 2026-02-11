@@ -23,7 +23,8 @@ document.getElementById("convertGif").onclick = async () => {
 
     const gifTitle = document.getElementById("gifTitle").value.trim();
     const startTime = parseFloat(startTimeInput.value) || 0;
-    const useSubtitles = document.getElementById("subtitleOption")?.value || "none";
+    const useSubtitles =
+      document.getElementById("subtitleOption")?.value || "none";
     const customText = document.getElementById("customText")?.value || "";
 
     result.innerHTML = "Creating GIF...";
@@ -55,11 +56,15 @@ document.getElementById("convertGif").onclick = async () => {
     const limit = res.headers.get("X-RateLimit-Limit");
     const reset = res.headers.get("X-RateLimit-Reset");
 
-    console.log(`Rate limit: ${remaining}/${limit}, resets at ${new Date(parseInt(reset) * 1000)}`);
+    console.log(
+      `Rate limit: ${remaining}/${limit}, resets at ${new Date(parseInt(reset) * 1000)}`,
+    );
 
     // Handle rate limit error
     if (res.status === 429) {
-      const errorData = await res.json().catch(() => ({ error: "Too many requests" }));
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: "Too many requests" }));
 
       let minutesLeft = "a few";
       if (reset) {
@@ -73,7 +78,9 @@ document.getElementById("convertGif").onclick = async () => {
 
     // Handle other HTTP errors
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: `Server error (${res.status})` }));
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: `Server error (${res.status})` }));
       throw new Error(errorData.error || `HTTP ${res.status}`);
     }
 
@@ -97,8 +104,6 @@ document.getElementById("convertGif").onclick = async () => {
       <p>GIF created${data.hasSubtitles ? " with subtitles" : ""}!</p>
       <img src="${data.gifUrl}" style="max-width: 100%;" />
       <p><a href="${data.gifUrl}" target="_blank">Open in new tab</a></p>`;
-
-  
   } catch (error) {
     console.error("Error creating GIF:", error);
     result.innerHTML = `<p>Failed to create GIF: ${error.message}</p>`;
