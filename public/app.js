@@ -50,9 +50,9 @@ document.getElementById("convertGif").onclick = async () => {
     let customText = sanitizeString(document.getElementById("customText")?.value || "").slice(0, 200);
 
     result.innerHTML = `
-      <div class="loader-with-text">
+      <div class="loaderWithText">
         <div class="loader"></div>
-        <div class="loader-text">Creating your GIF...</div>
+        <div class="loaderText">Creating your GIF...</div>
       </div>
     `;
 

@@ -19,7 +19,7 @@ async function loadGifs() {
     grid.innerHTML = gifs
       .map(
         (gif) => `
-      <div class="gif-card">
+      <div class="gifCard">
         <a href="/${gif.slug}" target="_blank">
           <img src="${gif.url}" alt="${gif.title}" loading="lazy" />
           <p>${gif.title}</p>

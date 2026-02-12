@@ -106,11 +106,11 @@ button:hover {
     gap: var(--spacing-xl);
   }
 
-  .url-section {
+  .urlSection {
     flex-direction: column;
   }
 
-  .url-section button {
+  .urlSection button {
     width: 100%;
   }
 }

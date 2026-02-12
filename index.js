@@ -3,7 +3,7 @@ import { apiLimiter, convertLimiter } from "./middleware/rateLimiter.js";
 import connectDB from "./config/database.js";
 import gifRoutes from "./routes/gifs.js";
 import gifConverterRoutes from "./routes/convert.js";
-import gifViewRoutes from "./routes/gif-view.js";
+import gifViewRoutes from "./routes/gifView.js";
 import path from 'path';
 import { fileURLToPath } from "url";
 

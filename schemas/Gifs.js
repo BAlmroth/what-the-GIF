@@ -14,7 +14,7 @@ const gifSchema = new Schema(
     },
     url: {
       type: String,
-      required: true, // lägg till validering/säkerhet?
+      required: true,
     },
     hasSubtitles: {
       type: Boolean,
