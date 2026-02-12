@@ -6,7 +6,6 @@ const Gif = GifModel;
 
 const router = express.Router();
 
-// testing to post gif just to see if it works :D
 router.post("/", async (req, res) => {
   try {
     const { title, url } = req.body;
