@@ -68,16 +68,16 @@ export const downloadYouTubeVideo = async (videoUrl) => {
                 : 'Direct';
             const cookieDesc = strategy.useCookies ? '+ Cookies' : '';
             
-            console.log(`🔄 Attempt ${i + 1}/${strategies.length}: ${methodDesc} ${cookieDesc}`);
+            console.log(`Attempt ${i + 1}/${strategies.length}: ${methodDesc} ${cookieDesc}`);
             
             const result = await attemptDownload(videoUrl, outputPath, strategy);
             
-            console.log(`✅ Download successful with: ${methodDesc} ${cookieDesc}`);
+            console.log(`Download successful with: ${methodDesc} ${cookieDesc}`);
             return result;
             
         } catch (error) {
             lastError = error;
-            console.log(`❌ Failed:`, error.message.split('\n')[0]);
+            console.log(`Failed:`, error.message.split('\n')[0]);
             
             // Clean up failed download
             if (fs.existsSync(outputPath)) {
@@ -89,8 +89,8 @@ export const downloadYouTubeVideo = async (videoUrl) => {
         }
     }
     
-    // All strategies failed
-    throw new Error(`All download strategies failed. Last error: ${lastError.message}`);
+    console.error('YouTube download failed after all attempts:', lastError);
+    throw new Error('Could not download video. Please check the URL and try again.');
 };
 
 // Get next server in rotation
@@ -136,7 +136,7 @@ async function attemptDownload(videoUrl, outputPath, strategy) {
     }
     
     const stats = fs.statSync(outputPath);
-    console.log(`📦 Downloaded: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
+    console.log(`Downloaded: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
     
     return {
         filepath: outputPath,

@@ -27,53 +27,40 @@ router.post("/", convertLimiter, upload.single('subtitleFile'), async (req, res)
     } = req.body;
 
     if (!videoUrl) {
-      return res.status(400).json({ error: "videoUrl is required" });
+      return res.status(400).json({ error: "Please enter a video URL." });
     }
 
+    // Download video
     console.log("Downloading video from YouTube...");
-    try {
-      const video = await downloadYouTubeVideo(videoUrl);
-      videoPath = video.filepath;
-    } catch (err) {
-      console.error("YouTube download error:", err);
-      throw new Error(`Failed to download video: ${err.message}`);
-    }
+    const video = await downloadYouTubeVideo(videoUrl);
+    videoPath = video.filepath;
 
     // Handle custom subtitles
     if (useSubtitles === "custom" && customSubtitleText) {
       console.log("Creating custom subtitle file...");
-      try {
-        const startTimeSeconds = parseFloat(startTime);
-        const durationSeconds = parseFloat(duration);
+      const startTimeSeconds = parseFloat(startTime);
+      const durationSeconds = parseFloat(duration);
 
-        subtitlePath = await createCustomSubtitle(
-          customSubtitleText,
-          startTimeSeconds,
-          durationSeconds
-        );
-      } catch (err) {
-        console.error("Custom subtitle creation error:", err);
-        throw new Error(`Failed to create custom subtitle: ${err.message}`);
-      }
+      subtitlePath = await createCustomSubtitle(
+        customSubtitleText,
+        startTimeSeconds,
+        durationSeconds
+      );
     } else if (useSubtitles === "upload" && req.file) {
       console.log("Using uploaded subtitle file...");
       subtitlePath = req.file.path;
     }
 
+    // Convert to GIF
     console.log("Converting video to GIF...");
-    let gifResult;
-    try {
-      gifResult = await convertVideoToGif(videoPath, {
-        startTime,
-        duration,
-        scaleWidth: 480,
-        subtitlePath
-      });
-    } catch (err) {
-      console.error("GIF conversion error:", err);
-      throw new Error(`Failed to convert video to GIF: ${err.message}`);
-    }
+    const gifResult = await convertVideoToGif(videoPath, {
+      startTime,
+      duration,
+      scaleWidth: 480,
+      subtitlePath
+    });
 
+    // Save to database
     console.log('Saving to database...');
 
     // Generate better default title if not provided
@@ -88,46 +75,45 @@ router.post("/", convertLimiter, upload.single('subtitleFile'), async (req, res)
     const slug = await generateUniqueSlug(gifTitle, Gif);
     console.log(`Generated slug: "${slug}" for title: "${gifTitle}"`);
 
-    try {
-      const newGif = new Gif({
-        title: gifTitle,
-        slug: slug,
-        url: gifResult.url,
-        cloudinaryId: gifResult.cloudinaryId,
-        youtubeUrl: videoUrl,
-        startTime,
-        duration,
-        fileSize: gifResult.fileSize,
-        width: gifResult.width,
-        height: gifResult.height,
-        hasSubtitles: subtitlePath !== null
-      });
-      await newGif.save();
+    const newGif = new Gif({
+      title: gifTitle,
+      slug: slug,
+      url: gifResult.url,
+      cloudinaryId: gifResult.cloudinaryId,
+      youtubeUrl: videoUrl,
+      startTime,
+      duration,
+      fileSize: gifResult.fileSize,
+      width: gifResult.width,
+      height: gifResult.height,
+      hasSubtitles: subtitlePath !== null
+    });
+    await newGif.save();
 
-      res.json({
-        gifUrl: gifResult.url,
-        gifId: newGif._id,
-        slug: newGif.slug,
-        shareUrl: `${req.protocol}://${req.get('host')}/${slug}`,
-        hasSubtitles: subtitlePath !== null
-      });
-    } catch (err) {
-      console.error("Database save error:", err);
-      throw new Error(`Failed to save GIF to database: ${err.message}`);
+    res.json({
+      gifUrl: gifResult.url,
+      gifId: newGif._id,
+      slug: newGif.slug,
+      shareUrl: `${req.protocol}://${req.get('host')}/${slug}`,
+      hasSubtitles: subtitlePath !== null
+    });
+
+  } catch (error) {
+    console.error("Error in /convert route:", error);
+    
+    //user message based on error
+    let userMessage = "Failed to create GIF. Please try again.";
+    
+    if (error.message.includes("Could not download video")) {
+      userMessage = "Could not download video. Please check the URL and try again.";
+    } else if (error.message.includes("Failed to apply subtitles")) {
+      userMessage = "Failed to apply subtitles. Please try again.";
+    } else if (error.message.includes("Failed to convert video to GIF")) {
+      userMessage = "Failed to convert video to GIF. Please try again.";
     }
-  } catch (err) {
-    console.error("Error in /convert route:", err);
-    res.status(500).json({ error: err.message });
+    
+    res.status(500).json({ error: userMessage });
   }
 });
-
-// Helper function to parse time string (e.g. "00:01:30") into seconds
-function parseTime(timeStr) {
-  const parts = timeStr.split(':');
-  const hours = parseInt(parts[0]) || 0;
-  const minutes = parseInt(parts[1]) || 0;
-  const seconds = parseInt(parts[2]) || 0;
-  return hours * 3600 + minutes * 60 + seconds;
-}
 
 export default router;

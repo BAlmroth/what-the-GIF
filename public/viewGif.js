@@ -50,7 +50,7 @@
                     <a href="/gallery">View Gallery</a>
                 </div>
           
-                <div class="share-box">
+                <div class="shareBox">
                     <p>Share this GIF:</p>
 
                     <input 

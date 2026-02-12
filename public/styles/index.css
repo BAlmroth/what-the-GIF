@@ -6,34 +6,34 @@
 }
 
 /* Header Section */
-.header-section {
+.headerSection {
   text-align: center;
   margin-bottom: var(--spacing-2xl);
 }
 
-.header-section h1 {
+.headerSection h1 {
   margin-bottom: var(--spacing-md);
 }
 
-.header-section p {
+.headerSection p {
   color: var(--text-secondary);
   font-size: 1.1rem;
 }
 
 /* URL Section */
-.url-section {
+.urlSection {
   max-width: 800px;
   margin: 0 var(--spacing-xl) var(--spacing-xl);
   display: flex;
   gap: var(--spacing-md);
 }
 
-.url-section input {
+.urlSection input {
   flex: 1;
   margin: 0;
 }
 
-.url-section button {
+.urlSection button {
   flex-shrink: 0;
   width: auto;
   padding: var(--spacing-md) var(--spacing-xl);
@@ -49,16 +49,16 @@
   align-items: center;
 }
 
-.video-column {
+.videoColumn {
   display: flex;
   flex-direction: column;
 }
 
-.video-column > button {
+.videoColumn > button {
   margin-top: var(--spacing-lg);
 }
 
-.controls-column {
+.controlsColumn {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -75,7 +75,7 @@
 }
 
 /* controls/options */
-.gif-controls,
+.gifControls,
 .subtitle-options {
   background: var(--secoundaryBackground);
   padding: var(--spacing-xl);
@@ -83,14 +83,14 @@
   border: 1px solid var(--border-color);
 }
 
-.gif-controls label {
+.gifControls label {
   display: block;
   color: var(--text-primary);
   font-weight: 500;
   margin-bottom: var(--spacing-md);
 }
 
-.subtitle-options label {
+.subtitleOptions label {
   display: flex; /* instead of block */
   align-items: center; /* vertically align radio + text */
   gap: var(--spacing-xl); /* space between radio and text */
@@ -98,13 +98,13 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.subtitle-options label {
+.subtitleOptions label {
   cursor: pointer;
   padding: var(--spacing-sm) 0;
   margin-bottom: var(--spacing-sm);
 }
 
-.subtitle-options h3 {
+.subtitleOptions h3 {
   margin-bottom: var(--spacing-md);
 }
 

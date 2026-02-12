@@ -2,9 +2,26 @@ const input = document.getElementById("videoUrl");
 const iframe = document.getElementById("player");
 const result = document.getElementById("result");
 const startTimeInput = document.getElementById("startTime");
+//sanitize and validate inputs
+function sanitizeString(str) {
+  return str.replace(/[<>$`"'{};]/g, "").trim();
+}
+
+function isValidYoutubeUrl(url) {
+  return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(url);
+}
+
+function isValidDuration(duration) {
+  return !isNaN(duration) && duration >= 0 && duration <= 3600;
+}
 
 document.getElementById("loadVideo").onclick = () => {
-  const url = input.value.trim();
+  const url = sanitizeString(input.value);
+  if (!isValidYoutubeUrl(url)) {
+    alert("Invalid YouTube URL");
+    return;
+  }
+
   const videoId = extractVideoId(url);
   if (!videoId) {
     alert("Invalid YouTube URL");
@@ -14,25 +31,28 @@ document.getElementById("loadVideo").onclick = () => {
 };
 
 document.getElementById("convertGif").onclick = async () => {
-  const result = document.getElementById("result");
   result.classList.remove("hidden");
+
   try {
-    const videoUrl = input.value.trim();
-    if (!videoUrl) {
-      result.innerHTML = "<p>Please enter a YouTube video URL.</p>";
+    const videoUrl = sanitizeString(input.value);
+    if (!videoUrl || !isValidYoutubeUrl(videoUrl)) {
+      result.innerHTML = "<p>Please enter a valid YouTube video URL.</p>";
       return;
     }
 
-    const gifTitle = document.getElementById("gifTitle").value.trim();
-    const startTime = parseFloat(startTimeInput.value) || 0;
-    const useSubtitles =
-      document.getElementById("subtitleOption")?.value || "none";
-    const customText = document.getElementById("customText")?.value || "";
+    let gifTitle = document.getElementById("gifTitle").value || "my-gif";
+    gifTitle = sanitizeString(gifTitle).slice(0, 50);
+
+    let startTime = parseFloat(startTimeInput.value) || 0;
+    if (!isValidDuration(startTime)) startTime = 0;
+
+    const useSubtitles = sanitizeString(document.getElementById("subtitleOption")?.value || "none");
+    let customText = sanitizeString(document.getElementById("customText")?.value || "").slice(0, 200);
 
     result.innerHTML = `
-      <div class="loader-with-text">
+      <div class="loaderWithText">
         <div class="loader"></div>
-        <div class="loader-text">Creating your GIF...</div>
+        <div class="loaderText">Creating your GIF...</div>
       </div>
     `;
 
@@ -63,15 +83,11 @@ document.getElementById("convertGif").onclick = async () => {
     const limit = res.headers.get("X-RateLimit-Limit");
     const reset = res.headers.get("X-RateLimit-Reset");
 
-    console.log(
-      `Rate limit: ${remaining}/${limit}, resets at ${new Date(parseInt(reset) * 1000)}`,
-    );
+    console.log(`Rate limit: ${remaining}/${limit}, resets at ${new Date(parseInt(reset) * 1000)}`);
 
     // Handle rate limit error
     if (res.status === 429) {
-      const errorData = await res
-        .json()
-        .catch(() => ({ error: "Too many requests" }));
+      const errorData = await res.json().catch(() => ({ error: "Too many requests" }));
 
       let minutesLeft = "a few";
       if (reset) {
@@ -85,25 +101,16 @@ document.getElementById("convertGif").onclick = async () => {
 
     // Handle other HTTP errors
     if (!res.ok) {
-      const errorData = await res
-        .json()
-        .catch(() => ({ error: `Server error (${res.status})` }));
-      throw new Error(errorData.error || `HTTP ${res.status}`);
-    }
-
-    // Parse successful response
-    let data;
-    try {
-      data = await res.json();
-    } catch (parseError) {
-      console.error("Failed to parse server response:", parseError);
-      result.innerHTML = `<p>Server returned invalid response (Status: ${res.status})</p>`;
+      const errorData = await res.json().catch(() => ({ error: "Something went wrong. Please try again." }));
+      result.innerHTML = `<p>${errorData.error}</p>`;
       return;
     }
 
+    // Parse successful response
+    const data = await res.json();
+
     if (data.error) {
-      console.error("Server error:", data.error);
-      result.innerHTML = `<p>Error: ${data.error}</p>`;
+      result.innerHTML = `<p>${data.error}</p>`;
       return;
     }
 
@@ -111,15 +118,14 @@ document.getElementById("convertGif").onclick = async () => {
       <p>GIF created${data.hasSubtitles ? " with subtitles" : ""}!</p>
       <img src="${data.gifUrl}"/>
       <p><a href="${data.shareUrl}" target="_blank">Open GIF in new tab</a></p>`;
+      
   } catch (error) {
     console.error("Error creating GIF:", error);
-    result.innerHTML = `<p>Failed to create GIF: ${error.message}</p>`;
+    result.innerHTML = `<p>Failed to create GIF. Please try again.</p>`;
   }
 };
 
 function extractVideoId(url) {
-  const match = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^\s&]+)/,
-  );
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^\s&]+)/);
   return match ? match[1] : null;
 }

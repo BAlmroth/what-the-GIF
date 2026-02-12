@@ -12,7 +12,6 @@ const tempDirectory = path.resolve(__dirname, '../temp');
 
 // Apply subtitles to video using FFmpeg
 export const applySubtitlesToVideo = async (videoPath, subtitlePath, options= {}) => {
-
     const {
         fontSize = 30,
         fontColor = 'white',
@@ -24,31 +23,27 @@ export const applySubtitlesToVideo = async (videoPath, subtitlePath, options= {}
     const timestamp = Date.now();
     const outPath = path.join(tempDirectory, `video-subtitled-${timestamp}.mp4`);
 
-
     const escapedSubPath = subtitlePath.replace(/\\/g, '/').replace(/:/g, '\\:');
 
     const forceStyle = `FontSize=${fontSize},PrimaryColour=&H${colorToHex(fontColor)}&,OutlineColour=&H${colorToHex(outlineColor)}&,Outline=${outlineWidth},Alignment=${position === 'top' ? 6 : 2}`;
 
     const command = `ffmpeg -i "${videoPath}" -vf "subtitles='${escapedSubPath}':force_style='${forceStyle}'" -c:a copy "${outPath}"`;
 
-    try {
-        console.log('Applying subtitles to video with command:', command);
-        await execAsync(command);
+    console.log('Applying subtitles to video with command:', command);
+    
+    await execAsync(command);
 
-        if (!fs.existsSync(outPath)) {
-            throw new Error('Subtitled video file was not created.');
-        }
-
-        console.log('Subtitles applied successfully. Output path:', outPath);
-
-        return {
-            filepath: outPath,
-            filename: path.basename(outPath)
-        };
-    } catch (error) {
-        console.error('Error applying subtitles to video:', error);
-        throw error;
+    if (!fs.existsSync(outPath)) {
+        console.error('Subtitled video file was not created at:', outPath);
+        throw new Error('Failed to apply subtitles to video.');
     }
+
+    console.log('Subtitles applied successfully. Output path:', outPath);
+
+    return {
+        filepath: outPath,
+        filename: path.basename(outPath)
+    };
 };
 
 // Create custom subtitles
