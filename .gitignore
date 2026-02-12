@@ -2,3 +2,4 @@
 .env
 node_modules
 downloads
+config/youtube_cookies.txt
