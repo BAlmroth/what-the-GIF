@@ -2,9 +2,26 @@ const input = document.getElementById("videoUrl");
 const iframe = document.getElementById("player");
 const result = document.getElementById("result");
 const startTimeInput = document.getElementById("startTime");
+//sanitize and validate inputs
+function sanitizeString(str) {
+  return str.replace(/[<>$`"'{};]/g, "").trim();
+}
+
+function isValidYoutubeUrl(url) {
+  return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(url);
+}
+
+function isValidDuration(duration) {
+  return !isNaN(duration) && duration >= 0 && duration <= 3600;
+}
 
 document.getElementById("loadVideo").onclick = () => {
-  const url = input.value.trim();
+  const url = sanitizeString(input.value);
+  if (!isValidYoutubeUrl(url)) {
+    alert("Invalid YouTube URL");
+    return;
+  }
+
   const videoId = extractVideoId(url);
   if (!videoId) {
     alert("Invalid YouTube URL");
@@ -14,20 +31,23 @@ document.getElementById("loadVideo").onclick = () => {
 };
 
 document.getElementById("convertGif").onclick = async () => {
-  const result = document.getElementById("result");
   result.classList.remove("hidden");
-  
+
   try {
-    const videoUrl = input.value.trim();
-    if (!videoUrl) {
-      result.innerHTML = "<p>Please enter a YouTube video URL.</p>";
+    const videoUrl = sanitizeString(input.value);
+    if (!videoUrl || !isValidYoutubeUrl(videoUrl)) {
+      result.innerHTML = "<p>Please enter a valid YouTube video URL.</p>";
       return;
     }
 
-    const gifTitle = document.getElementById("gifTitle").value.trim();
-    const startTime = parseFloat(startTimeInput.value) || 0;
-    const useSubtitles = document.getElementById("subtitleOption")?.value || "none";
-    const customText = document.getElementById("customText")?.value || "";
+    let gifTitle = document.getElementById("gifTitle").value || "my-gif";
+    gifTitle = sanitizeString(gifTitle).slice(0, 50);
+
+    let startTime = parseFloat(startTimeInput.value) || 0;
+    if (!isValidDuration(startTime)) startTime = 0;
+
+    const useSubtitles = sanitizeString(document.getElementById("subtitleOption")?.value || "none");
+    let customText = sanitizeString(document.getElementById("customText")?.value || "").slice(0, 200);
 
     result.innerHTML = `
       <div class="loader-with-text">
