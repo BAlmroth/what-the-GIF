@@ -9,13 +9,13 @@ The application downloads videos using **yt-dlp**, converts a selected portion i
 ## Features
 
 - Convert YouTube videos to GIF
-- Choose start time and duration
+- Choose start time (duration 5 sec)
 - Optional subtitles
 - Upload GIFs to Cloudinary
 - Store GIF data in MongoDB
 - View created GIFs in a gallery
 - Copy paste gif URL for usage
-- API rate limiting for protection
+
 
 ---
 
