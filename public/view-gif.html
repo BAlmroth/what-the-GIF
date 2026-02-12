@@ -1,144 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GIF - What-the-GIF</title>
-</head>
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/gifView.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+  </head>
 
-<body>
-    <div id="content" class="loading">
-        Loading GIF...
-    </div>
-
-    <script>
-        // Get slug from URL path
-        const slug = window.location.pathname.substring(1);
-
-        async function loadGif() {
-            try {
-                const res = await fetch(`/api/gif/${slug}`);
-
-                if (!res.ok) {
-                    if (res.status === 404) {
-                        show404();
-                    } else {
-                        showError('Failed to load GIF.');
-                    }
-                    return;
-                }
-
-                const gif = await res.json();
-                displayGif(gif);
-            } catch (error) {
-                console.log('Error fetching GIF:', error);
-                showError('An error occurred while loading the GIF.');
-            }
-        }
-
-        function displayGif(gif) {
-            // Update page title
-            document.title = `${gif.title} - What The GIF`;
-
-            const firstUpperCaseTitle = gif.title.charAt(0).toUpperCase() + gif.title.slice(1);
-
-            // Update Open Graph meta tags
-            updateMetaTags(gif);
-
-            // Display content
-            document.getElementById('content').innerHTML = `
-            <div class="container">
-                <h1>${firstUpperCaseTitle}</h1>
-                <img src="${gif.url}" alt="${gif.title}" />
-          
-                <div class="meta">
-                    ${gif.hasSubtitles ? 'Has subtitles | ' : ''}
-                    ${gif.views} views | 
-                    ${new Date(gif.createdAt).toLocaleDateString()}
-                </div>
-          
-                <div class="actions">
-                    <a href="${gif.url}" download>Download GIF</a>
-                    <a href="/">Create Your Own</a>
-                    <a href="/gallery">View Gallery</a>
-                </div>
-          
-                <div class="share-box">
-                    <p style="margin: 0; font-weight: bold;">Share this GIF:</p>
-
-                    <input 
-                        type="text" 
-                        value="${window.location.href}" 
-                        readonly 
-                        onclick="this.select()"
-                        id="shareUrl"
-                    />
-
-                    <button class="copy-btn" onclick="copyLink()">Copy Link</button>
-                </div>
-            </div>
-            `;
-        }
-
-        function show404() {
-            document.getElementById('content').innerHTML = `
-                <div class="container error">
-                    <h1>404 - GIF Not Found</h1>
-                    <p>This GIF doesn't exist or has been removed.</p>
-
-                    <div class="actions">
-                        <a href="/gallery">← Back to Gallery</a>
-                        <a href="/">Create a GIF</a>
-                    </div>
-                </div>
-            `;
-        }
-    
-        function showError(message) {
-            document.getElementById('content').innerHTML = `
-                <div class="container error">
-                    <h1>Error</h1>
-                    <p>${message}</p>
-
-                    <div class="actions">
-                        <a href="/">← Back to Home</a>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateMetaTags(gif) {
-            // Update meta tags for social sharing
-            const metaTags = [
-                { property: 'og:title', content: gif.title },
-                { property: 'og:image', content: gif.url },
-                { property: 'og:type', content: 'website' },
-                { property: 'og:url', content: window.location.href }
-            ];
-
-            metaTags.forEach(({ property, content }) => {
-                let meta = document.querySelector(`meta[property="${property}"]`);
-                if (!meta) {
-                    meta = document.createElement('meta');
-                    meta.setAttribute('property', property);
-                    document.head.appendChild(meta);
-                }
-                meta.setAttribute('content', content);
-            });
-        }
-
-        window.copyLink = () => {
-            const input = document.getElementById('shareUrl');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            alert('Link copied to clipboard!');
-        };
-
-        // Load the GIF when the page loads
-        loadGif();
-
-    </script>
-</body>
-
+  <body>
+    <div id="content" class="loading">Loading GIF...</div>
+  <script src="viewGif.js"></script>
+  <script src="components.js"></script>
+  </body>
 </html>

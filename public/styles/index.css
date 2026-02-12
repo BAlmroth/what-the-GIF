@@ -127,7 +127,8 @@ input[type="file"] {
 
 #customTextBox,
 #uploadBox {
-  margin-top: var(--spacing-md);
+    display: none;
+    margin-top: var(--spacing-md);
 }
 
 /* results */
