@@ -6,6 +6,12 @@ const gifSchema = new Schema(
       type: String,
       required: true,
     },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
     url: {
       type: String,
       required: true, // lägg till validering/säkerhet?
