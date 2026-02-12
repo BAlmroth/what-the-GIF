@@ -78,7 +78,7 @@
               Upload .srt File
             </label>
 
-            <div id="customTextBox" style="display: none; margin-top: 10px">
+            <div id="customTextBox">
               <textarea
                 id="customText"
                 rows="3"
@@ -86,7 +86,7 @@
               ></textarea>
             </div>
 
-            <div id="uploadBox" style="display: none; margin-top: 10px">
+            <div id="uploadBox">
               <input type="file" id="subtitleFile" accept=".srt" />
             </div>
           </div>
@@ -96,7 +96,7 @@
       <div id="result" class="hidden"></div>
     </section>
 
-    <script>
+    <script> //only frontend, would clutter app.js
       function updateSubtitleUI(value) {
         document.getElementById("customTextBox").style.display =
           value === "custom" ? "block" : "none";
