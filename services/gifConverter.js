@@ -43,12 +43,14 @@ export const convertVideoToGif = async (videoPath, options = {}) => {
         const gifPath = path.join(tempDirectory, gifFileName);
 
         console.log('Converting to GIF...');
+        
         const command = `ffmpeg -ss ${startTime} -t ${duration} -i "${processedVideoPath}" -vf "fps=${fps},scale=${scaleWidth}:-1:flags=lanczos" -loop 0 "${gifPath}"`;
         
         await execAsync(command);
         
         if (!fs.existsSync(gifPath)) {
-            throw new Error('GIF file was not created');
+            console.error('GIF file was not created at:', gifPath);
+            throw new Error('Failed to create GIF file.');
         }
         
         const stats = fs.statSync(gifPath);
@@ -64,7 +66,7 @@ export const convertVideoToGif = async (videoPath, options = {}) => {
         // Cleanup
         const filesToClean = [videoPath, gifPath];
         if (subtitlePath) filesToClean.push(subtitlePath);
-        if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);  // ← Clean subtitled video too
+        if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);
         cleanupTempFiles(...filesToClean);
 
         console.log('GIF created:', result.secure_url);
@@ -87,6 +89,7 @@ export const convertVideoToGif = async (videoPath, options = {}) => {
         if (subtitledVideoPath) filesToClean.push(subtitledVideoPath);
         cleanupTempFiles(...filesToClean);
 
-        throw error;
+        //user message
+        throw new Error('Failed to convert video to GIF. Please try again.');
     }
 };
